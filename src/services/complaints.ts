@@ -22,6 +22,18 @@ export async function getComplaints(page = 1, pageSize = 20) {
   return { data: data as (Complaint & { profiles: { name: string } | null; authorities: { name: string; type: string } | null })[], count: count || 0 }
 }
 
+export async function getAllComplaints() {
+  const supabase = await getClient()
+  if (!supabase) return []
+  const { data, error } = await supabase
+    .from('complaints')
+    .select('*, profiles(name), authorities(name, type)')
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data as (Complaint & { profiles: { name: string } | null; authorities: { name: string; type: string } | null })[]
+}
+
 export async function getComplaintsByAuthority(authorityId: string) {
   const supabase = await getClient()
   if (!supabase) return []

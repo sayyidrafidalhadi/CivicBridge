@@ -1,11 +1,10 @@
-import { useEffect, useState, useMemo, useCallback } from 'react'
-import { AnimatePresence } from 'framer-motion'
+import { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import {
   AlertCircle, CheckCircle2, Clock, FileText, Filter,
   X, Search, Building2, MapPin, Calendar, User, BarChart3,
-  ShieldAlert, Eye
+  ShieldAlert, Eye, ChevronDown, ChevronUp
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import type { Complaint, ComplaintStatus, Authority, ComplaintAction } from '../types'
@@ -13,19 +12,22 @@ import StatusBadge from '../components/StatusBadge'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { useAuth } from '../hooks/useAuth'
 import { useRealtimeComplaints } from '../hooks/useRealtime'
-import { getComplaintsByAuthority, updateComplaintStatus, getComplaintActions } from '../services/complaints'
-import { getAuthority } from '../services/authorities'
+import { getAllComplaints, updateComplaintStatus, getComplaintActions } from '../services/complaints'
+import { getAuthorities } from '../services/authorities'
 import { formatDate } from '../utils'
 
 const STATUSES = ['all', 'submitted', 'under_review', 'in_progress', 'resolved']
+const AUTH_TYPES = ['all', 'mla', 'mp', 'ward_member', 'panchayat', 'municipality', 'corporation', 'water_authority', 'electricity_board', 'other'] as const
+const PIE_COLORS = ['#111827', '#374151', '#6b7280', '#9ca3af']
 
 export default function Admin() {
   const { t } = useTranslation()
   const { user } = useAuth()
-  const [complaints, setComplaints] = useState<Complaint[]>([])
-  const [authority, setAuthority] = useState<Authority | null>(null)
+  const [complaints, setComplaints] = useState<(Complaint & { profiles: { name: string } | null; authorities: { name: string; type: string } | null })[]>([])
+  const [authorities, setAuthorities] = useState<Authority[]>([])
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('all')
+  const [filterAuthority, setFilterAuthority] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null)
   const [actions, setActions] = useState<ComplaintAction[]>([])
@@ -33,15 +35,15 @@ export default function Admin() {
   const [updateNotes, setUpdateNotes] = useState('')
   const [updateStatus, setUpdateStatus] = useState<ComplaintStatus | ''>('')
   const [updating, setUpdating] = useState(false)
+  const [expandedAuth, setExpandedAuth] = useState<string | null>(null)
 
-  useEffect(() => { if (user?.authority_id) loadData(user.authority_id); else setLoading(false) }, [user])
-  const refresh = useCallback(() => { if (user?.authority_id) loadData(user.authority_id) }, [user?.authority_id])
-  useRealtimeComplaints(refresh)
+  useEffect(() => { loadData() }, [])
+  useRealtimeComplaints(() => loadData())
 
-  const loadData = async (authorityId: string) => {
+  const loadData = async () => {
     try {
-      const [complaintsData, authorityData] = await Promise.all([getComplaintsByAuthority(authorityId), getAuthority(authorityId)])
-      setComplaints(complaintsData); setAuthority(authorityData)
+      const [complaintsData, authoritiesData] = await Promise.all([getAllComplaints(), getAuthorities()])
+      setComplaints(complaintsData); setAuthorities(authoritiesData)
     } catch { toast.error(t('admin.loadError')) }
     finally { setLoading(false) }
   }
@@ -59,7 +61,7 @@ export default function Admin() {
     try {
       await updateComplaintStatus(selectedComplaint.id, updateStatus as ComplaintStatus, updateNotes || undefined)
       toast.success(t('admin.update') + ' ✓')
-      if (user?.authority_id) loadData(user.authority_id)
+      loadData()
       setSelectedComplaint(prev => prev ? { ...prev, status: updateStatus as ComplaintStatus, resolution_notes: updateNotes || prev.resolution_notes } : null)
       setUpdateStatus(''); setUpdateNotes('')
     } catch { toast.error(t('admin.updateError')) }
@@ -67,22 +69,33 @@ export default function Admin() {
   }
 
   if (loading) return <LoadingSpinner size="lg" />
-  if (!authority) return (
-    <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-      <Building2 className="mx-auto h-12 w-12 text-gray-400" />
-      <h2 className="mt-4 text-xl font-semibold text-gray-900">{t('admin.noAuthority')}</h2>
-      <p className="mt-2 text-gray-600">{t('admin.noAuthorityDesc')}</p>
-    </div>
-  )
 
-  const stats = [
+  const authTypeComplaints = useMemo(() => {
+    const map = new Map<string, typeof complaints>()
+    AUTH_TYPES.filter(a => a !== 'all').forEach(a => map.set(a, []))
+    complaints.forEach(c => {
+      const type = c.authorities?.type || 'other'
+      const existing = map.get(type) || []
+      existing.push(c)
+      map.set(type, existing)
+    })
+    return map
+  }, [complaints])
+
+  const stats = useMemo(() => {
+    const labels = ['mla', 'mp', 'ward_member', 'panchayat', 'municipality', 'corporation', 'water_authority', 'electricity_board', 'other'] as const
+    return labels.map(type => {
+      const list = authTypeComplaints.get(type) || []
+      return { type, total: list.length, new: list.filter(c => c.status === 'submitted').length, active: list.filter(c => c.status !== 'resolved').length, resolved: list.filter(c => c.status === 'resolved').length }
+    })
+  }, [authTypeComplaints])
+
+  const totalStats = [
     { label: t('admin.total'), value: complaints.length, icon: FileText },
     { label: t('admin.new'), value: complaints.filter(c => c.status === 'submitted').length, icon: AlertCircle },
     { label: t('admin.inProgress'), value: complaints.filter(c => c.status === 'in_progress' || c.status === 'under_review').length, icon: Clock },
     { label: t('admin.resolved'), value: complaints.filter(c => c.status === 'resolved').length, icon: CheckCircle2 },
   ]
-
-  const PIE_COLORS = ['#111827', '#374151', '#6b7280', '#9ca3af']
 
   const categoryData = useMemo(() => {
     const map = new Map<string, number>()
@@ -105,6 +118,7 @@ export default function Admin() {
 
   const filtered = complaints
     .filter(c => filterStatus === 'all' || c.status === filterStatus)
+    .filter(c => filterAuthority === 'all' || c.authorities?.type === filterAuthority)
     .filter(c => !searchQuery || c.case_number.toLowerCase().includes(searchQuery.toLowerCase()) || c.title.toLowerCase().includes(searchQuery.toLowerCase()) || c.description.toLowerCase().includes(searchQuery.toLowerCase()))
 
   return (
@@ -115,17 +129,14 @@ export default function Admin() {
             <ShieldAlert className="w-7 h-7" />
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">{authority.name}</h1>
-              <span className="px-2.5 py-0.5 rounded-full bg-gray-200 text-gray-900 text-[10px] font-mono font-bold uppercase">{authority.type.replace('_', ' ')}</span>
-            </div>
-            {authority.jurisdiction && <p className="text-xs font-medium text-gray-500 mt-1"><MapPin className="h-3 w-3 inline" /> {authority.jurisdiction}</p>}
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">{t('admin.dashboard')}</h1>
+            <p className="text-xs font-medium text-gray-500 mt-1">{t('admin.manageComplaints', { name: authorities.length + ' authorities' })}</p>
           </div>
         </div>
       </div>
 
       <div className="mb-8 grid gap-4 grid-cols-2 sm:grid-cols-4">
-        {stats.map(s => (
+        {totalStats.map(s => (
           <div key={s.label} className="neo-card p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -139,6 +150,58 @@ export default function Admin() {
           </div>
         ))}
       </div>
+
+      <div className="mb-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {stats.map(s => (
+          <button key={s.type} onClick={() => setExpandedAuth(expandedAuth === s.type ? null : s.type)}
+            className={`neo-card p-4 text-left transition ${expandedAuth === s.type ? 'ring-2 ring-gray-900' : ''}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <Building2 className="h-4 w-4 text-gray-700 shrink-0" />
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-700 truncate">{t(`authority.${s.type}`)}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-bold text-gray-900">{s.total} total</span>
+              <div className="flex gap-2 text-[10px] font-semibold text-gray-500">
+                <span>{s.new} new</span>
+                <span>{s.active} active</span>
+                <span>{s.resolved} resolved</span>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {expandedAuth && (
+        <div className="mb-8 neo-card p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              {t(`authority.${expandedAuth}`)} — {authTypeComplaints.get(expandedAuth)?.length || 0} complaints
+            </h3>
+            <button onClick={() => setExpandedAuth(null)} className="p-1 rounded-lg hover:bg-gray-200 transition">
+              <X className="h-4 w-4 text-gray-500" />
+            </button>
+          </div>
+          <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+            {(authTypeComplaints.get(expandedAuth) || []).slice(0, 20).map(c => (
+              <div key={c.id} onClick={() => openDetail(c)}
+                className="flex items-center justify-between gap-3 p-3 neo-card-sm cursor-pointer">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-gray-500">#{c.case_number}</span>
+                    <StatusBadge status={c.status} />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900 truncate mt-0.5">{c.title}</p>
+                </div>
+                <span className="text-[10px] text-gray-400 shrink-0">{formatDate(c.created_at)}</span>
+              </div>
+            ))}
+            {(authTypeComplaints.get(expandedAuth) || []).length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-4">{t('admin.noComplaints')}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="mb-8 grid gap-6 lg:grid-cols-2">
         <div className="neo-card p-5">
@@ -182,20 +245,23 @@ export default function Admin() {
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
           <Filter className="h-4 w-4 flex-shrink-0 text-gray-500" />
           {STATUSES.map(s => (
-            <button
-              key={s}
-              onClick={() => setFilterStatus(s)}
-              className={`rounded-xl px-4 py-1.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap transition ${
-                filterStatus === s ? 'neo-btn-primary text-white shadow-sm' : 'neo-badge text-gray-700'
-              }`}>
+            <button key={s} onClick={() => setFilterStatus(s)}
+              className={`rounded-xl px-4 py-1.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap transition ${filterStatus === s ? 'neo-btn-primary text-white shadow-sm' : 'neo-badge text-gray-700'}`}>
               {s === 'all' ? t('complaints.all') : t(`status.${s}`)}
             </button>
           ))}
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input type="text" placeholder={t('admin.search')} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-            className="w-full sm:w-64 neo-input rounded-xl py-2 pl-9 pr-3 text-xs font-medium text-gray-900 outline-none" />
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input type="text" placeholder={t('admin.search')} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              className="w-full sm:w-56 neo-input rounded-xl py-2 pl-9 pr-3 text-xs font-medium text-gray-900 outline-none" />
+          </div>
+          <select value={filterAuthority} onChange={e => setFilterAuthority(e.target.value)}
+            className="neo-input rounded-xl px-3 py-2 text-xs font-medium text-gray-900 outline-none">
+            <option value="all">{t('complaints.all')} Authorities</option>
+            {AUTH_TYPES.filter(a => a !== 'all').map(a => <option key={a} value={a}>{t(`authority.${a}`)}</option>)}
+          </select>
         </div>
       </div>
 
@@ -214,10 +280,11 @@ export default function Admin() {
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="bg-gray-100 text-gray-600 font-bold uppercase tracking-wider border-b border-gray-200">
-                  <th className="py-3 px-6">Case</th>
+                  <th className="py-3 px-6">{t('admin.case')}</th>
                   <th className="py-3 px-4">{t('admin.complaint')}</th>
                   <th className="py-3 px-4">{t('admin.category')}</th>
                   <th className="py-3 px-4">{t('admin.status')}</th>
+                  <th className="py-3 px-4">Authority</th>
                   <th className="py-3 px-4">{t('admin.date')}</th>
                   <th className="py-3 px-6 text-right"></th>
                 </tr>
@@ -232,6 +299,7 @@ export default function Admin() {
                     </td>
                     <td className="py-3 px-4"><span className="px-2 py-1 bg-gray-200 rounded text-gray-900 font-semibold text-xs uppercase">{t(`categories.${complaint.category}`)}</span></td>
                     <td className="py-3 px-4"><StatusBadge status={complaint.status} /></td>
+                    <td className="py-3 px-4 text-gray-600 text-[10px] font-bold uppercase">{complaint.authorities?.name || '—'}</td>
                     <td className="py-3 px-4 text-gray-600">{formatDate(complaint.created_at)}</td>
                     <td className="py-3 px-6 text-right">
                       <button onClick={(e) => { e.stopPropagation(); openDetail(complaint) }}
@@ -270,7 +338,7 @@ export default function Admin() {
                   <div className="mt-2 flex flex-wrap gap-3 text-sm text-gray-500">
                     <span className="flex items-center gap-1.5"><User className="h-4 w-4" />{selectedComplaint.profiles?.name || t('complaints.anonymous')}</span>
                     <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" />{formatDate(selectedComplaint.created_at)}</span>
-                    <span className="flex items-center gap-1.5"><Building2 className="h-4 w-4" />{t(`categories.${selectedComplaint.category}`)}</span>
+                    <span className="flex items-center gap-1.5"><Building2 className="h-4 w-4" />{selectedComplaint.authorities?.name || t('complaints.anonymous')}</span>
                   </div>
                 </div>
 
@@ -290,7 +358,7 @@ export default function Admin() {
                   </div>
                 )}
 
-                {selectedComplaint.status !== 'resolved' && (
+                {user?.authority_id && selectedComplaint.assigned_to === user.authority_id && selectedComplaint.status !== 'resolved' && (
                   <div className="neo-card-sm p-4">
                     <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">{t('admin.updateStatus')}</h3>
                     <div className="flex flex-col gap-3 sm:flex-row">
@@ -301,8 +369,7 @@ export default function Admin() {
                       </select>
                       <input type="text" placeholder={t('admin.addNotes')} value={updateNotes} onChange={e => setUpdateNotes(e.target.value)}
                         className="flex-1 rounded-xl neo-input px-3 py-2 text-xs font-medium text-gray-900 outline-none" />
-                      <button
-                        onClick={handleUpdate} disabled={!updateStatus || updating}
+                      <button onClick={handleUpdate} disabled={!updateStatus || updating}
                         className="rounded-xl neo-btn-primary text-white px-5 py-2 text-xs font-bold uppercase tracking-wider disabled:opacity-50">
                         {updating ? t('admin.updating') : t('admin.update')}
                       </button>
