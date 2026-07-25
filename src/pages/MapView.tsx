@@ -35,7 +35,7 @@ export default function MapView() {
     : [20.5937, 78.9629]
 
   return (
-    <div className="mx-4 my-8">
+    <div className="mx-auto max-w-7xl px-4 py-12">
       <div className="neo-card overflow-hidden">
         <div className="p-6 sm:p-8 flex items-center gap-4 text-gray-900">
           <div className="p-3 rounded-2xl bg-black text-white">

@@ -16,7 +16,7 @@ export default function Landing() {
       <section className="relative overflow-hidden bg-gray-100">
         <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <img src="/logo-square.jpg" alt={t('app.name')} className="mx-auto h-20 w-20" />
+            <span className="brand text-5xl text-gray-900">Nammude Shabdham</span>
             <p className="mt-6 text-lg leading-8 text-gray-600">
               {t('landing.heroDesc')}
             </p>
@@ -55,7 +55,7 @@ export default function Landing() {
 
       <section className="bg-gray-900 py-20">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <img src="/logo-square.jpg" alt={t('app.name')} className="mx-auto h-16 w-16" />
+          <span className="brand text-3xl text-white">Nammude Shabdham</span>
           <h2 className="mt-6 text-3xl font-bold text-white">
             {t('landing.ctaTitle')}
           </h2>

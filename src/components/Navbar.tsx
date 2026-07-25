@@ -30,7 +30,7 @@ export default function Navbar({ user, onSignOut }: NavbarProps) {
         <div className="flex items-center justify-between h-16 gap-4">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/logo-wide.jpg" alt={t('app.name')} className="h-10" />
+              <span className="brand text-xl text-gray-900">Nammude Shabdham</span>
             </Link>
           </div>
 
@@ -77,7 +77,7 @@ export default function Navbar({ user, onSignOut }: NavbarProps) {
             )}
 
             <button onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-200 transition">
+              className="md:hidden p-2.5 rounded-lg text-gray-600 hover:bg-gray-200 transition">
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>

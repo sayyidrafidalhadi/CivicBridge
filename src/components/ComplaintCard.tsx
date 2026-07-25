@@ -24,7 +24,7 @@ export default function ComplaintCard({ complaint }: ComplaintCardProps) {
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-mono font-bold text-gray-500 uppercase">#{complaint.case_number}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 px-2 py-0.5 bg-gray-200 rounded-full">{complaint.category}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 px-2 py-0.5 bg-gray-200 rounded-full">{t(`categories.${complaint.category}`)}</span>
               </div>
               <StatusBadge status={complaint.status} />
             </div>

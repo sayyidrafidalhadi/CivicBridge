@@ -54,7 +54,7 @@ export default function ComplaintDetails() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
-      <Link to="/complaints" className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-700 hover:text-gray-900">
+      <Link to="/complaints" className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-900 hover:text-gray-600">
         <ArrowLeft className="h-4 w-4" /> {t('detail.back')}
       </Link>
 
@@ -96,13 +96,13 @@ export default function ComplaintDetails() {
             </div>
           )}
 
-          <div className="neo-card-sm p-5 space-y-3">
+            <div className="neo-card-sm p-5 space-y-3">
             <div className="flex items-center justify-between border-b border-gray-200 pb-2 text-xs">
-              <span className="text-gray-500 font-bold uppercase tracking-wider">Reported By</span>
+              <span className="text-gray-500 font-bold uppercase tracking-wider">{t('detail.reportedByLabel')}</span>
               <span className="font-bold text-gray-900">{complaint.profiles?.name || t('complaints.anonymous')}</span>
             </div>
             <div className="flex items-center justify-between border-b border-gray-200 pb-2 text-xs">
-              <span className="text-gray-500 font-bold uppercase tracking-wider">Category</span>
+              <span className="text-gray-500 font-bold uppercase tracking-wider">{t('detail.categoryLabel')}</span>
               <span className="font-bold text-gray-900">{t(`categories.${complaint.category}`)}</span>
             </div>
             {complaint.latitude && complaint.longitude && (
@@ -122,7 +122,7 @@ export default function ComplaintDetails() {
 
           {complaint.resolution_notes && (
             <div className="neo-card-sm p-5 bg-gray-200">
-              <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Resolution Summary</h4>
+              <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">{t('detail.resolutionSummary')}</h4>
               <p className="text-xs text-gray-700 leading-relaxed font-medium mt-1">&ldquo;{complaint.resolution_notes}&rdquo;</p>
             </div>
           )}

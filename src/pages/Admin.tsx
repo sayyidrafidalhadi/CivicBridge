@@ -124,7 +124,7 @@ export default function Admin() {
         </div>
       </div>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-4">
+      <div className="mb-8 grid gap-4 grid-cols-2 sm:grid-cols-4">
         {stats.map(s => (
           <div key={s.label} className="neo-card p-5">
             <div className="flex items-center justify-between">
@@ -200,7 +200,7 @@ export default function Admin() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="neo-card p-16 text-center">
+        <div className="neo-card p-8 sm:p-16 text-center">
           <FileText className="mx-auto h-10 w-10 text-gray-400" />
           <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('admin.noComplaints')}</h3>
           <p className="mt-1 text-gray-600">{searchQuery ? t('admin.noComplaintsSearch') : filterStatus !== 'all' ? t('complaints.noComplaintsStatus') : t('admin.noComplaintsAll')}</p>
@@ -208,7 +208,7 @@ export default function Admin() {
       ) : (
         <div className="neo-card rounded-3xl overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-100/50">
-            <h2 className="font-extrabold text-sm text-gray-900 uppercase tracking-wider">Complaint Registry ({filtered.length})</h2>
+            <h2 className="font-extrabold text-sm text-gray-900 uppercase tracking-wider">{t('admin.complaintRegistry')} ({filtered.length})</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
@@ -228,14 +228,14 @@ export default function Admin() {
                     <td className="py-3 px-6 font-mono font-bold text-gray-900">#{complaint.case_number}</td>
                     <td className="py-3 px-4 max-w-xs">
                       <p className="font-semibold text-gray-900 truncate">{complaint.title}</p>
-                      <p className="text-[11px] text-gray-500 truncate">{complaint.description}</p>
+                      <p className="text-xs text-gray-500 truncate">{complaint.description}</p>
                     </td>
-                    <td className="py-3 px-4"><span className="px-2 py-1 bg-gray-200 rounded text-gray-900 font-semibold text-[10px] uppercase">{t(`categories.${complaint.category}`)}</span></td>
+                    <td className="py-3 px-4"><span className="px-2 py-1 bg-gray-200 rounded text-gray-900 font-semibold text-xs uppercase">{t(`categories.${complaint.category}`)}</span></td>
                     <td className="py-3 px-4"><StatusBadge status={complaint.status} /></td>
                     <td className="py-3 px-4 text-gray-600">{formatDate(complaint.created_at)}</td>
                     <td className="py-3 px-6 text-right">
                       <button onClick={(e) => { e.stopPropagation(); openDetail(complaint) }}
-                        className="px-3 py-1.5 neo-btn-primary text-white rounded-xl font-bold text-[11px] flex items-center gap-1 ml-auto">
+                        className="px-3 py-1.5 neo-btn-primary text-white rounded-xl font-bold text-xs flex items-center gap-1 ml-auto">
                         <Eye className="w-3.5 h-3.5" />
                         <span>{t('admin.view')}</span>
                       </button>

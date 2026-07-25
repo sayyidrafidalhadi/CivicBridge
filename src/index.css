@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'OffBit-Bold';
+  src: url('/OffBit-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+.brand {
+  font-family: 'OffBit-Bold', sans-serif;
+  letter-spacing: 0.02em;
+}
+
 @layer utilities {
   .neo-card {
     background: #f3f4f6;

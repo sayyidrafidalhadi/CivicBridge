@@ -109,7 +109,10 @@ export default {
     "underReview": "അവലോകനത്തിൽ",
     "inProgress": "പുരോഗതിയിൽ",
     "notFound": "പരാതി കണ്ടെത്തിയില്ല",
-    "reportedBy": "{{name}} റിപ്പോർട്ട് ചെയ്തത്"
+    "reportedBy": "{{name}} റിപ്പോർട്ട് ചെയ്തത്",
+    "reportedByLabel": "റിപ്പോർട്ട് ചെയ്തത്",
+    "categoryLabel": "വിഭാഗം",
+    "resolutionSummary": "പരിഹാര സംഗ്രഹം"
   },
 
   "status": {
@@ -172,6 +175,7 @@ export default {
     "byCategory": "വിഭാഗം അനുസരിച്ചുള്ള പരാതികൾ",
     "byStatus": "സ്റ്റാറ്റസ് അനുസരിച്ചുള്ള പരാതികൾ",
     "noData": "വിവരങ്ങൾ ലഭ്യമല്ല",
+    "complaintRegistry": "പരാതി രജിസ്ട്രി",
     "statusChanged": "{{name}} സ്റ്റാറ്റസ് {{from}} ൽ നിന്ന് {{to}} ലേക്ക് മാറ്റി",
     "loadError": "ഡാഷ്ബോർഡ് ലോഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു",
     "updateError": "സ്റ്റാറ്റസ് അപ്ഡേറ്റ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു"

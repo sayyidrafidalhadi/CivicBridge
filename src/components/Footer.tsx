@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
-            <img src="/logo-square.jpg" alt={t('app.name')} className="h-8 w-8" />
+            <span className="brand text-lg text-white">Nammude Shabdham</span>
           </div>
           <p className="text-sm">{t('app.tagline')}</p>
         </div>

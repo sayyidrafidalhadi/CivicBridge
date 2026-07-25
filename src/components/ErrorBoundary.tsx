@@ -29,7 +29,7 @@ export default class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex min-h-screen items-center justify-center p-8 bg-gray-100">
           <div className="max-w-md text-center">
-            <img src="/logo-square.jpg" alt={i18n.t('app.name')} className="mx-auto h-20 w-20" />
+            <span className="brand text-5xl text-gray-900">Nammude Shabdham</span>
             <h1 className="mt-6 text-2xl font-bold text-gray-900">{i18n.t('error.somethingWentWrong')}</h1>
             <p className="mt-3 text-gray-600">{this.state.error?.message || i18n.t('error.somethingWentWrong')}</p>
             <button onClick={() => window.location.reload()}

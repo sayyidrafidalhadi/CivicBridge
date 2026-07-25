@@ -41,7 +41,7 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="neo-card p-8">
           <div className="text-center mb-8">
-            <img src="/logo-square.jpg" alt={t('app.name')} className="mx-auto h-14 w-14" />
+            <span className="brand text-3xl text-gray-900">Nammude Shabdham</span>
             <h2 className="mt-4 text-2xl font-bold text-gray-900">
               {isSignUp ? t('auth.createAccount') : t('auth.welcomeBack')}
             </h2>

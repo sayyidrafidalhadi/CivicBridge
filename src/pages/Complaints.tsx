@@ -83,7 +83,7 @@ export default function Complaints() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="neo-card p-16 text-center">
+        <div className="neo-card p-8 sm:p-16 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-200">
             <ClipboardList className="h-6 w-6 text-gray-400" />
           </div>

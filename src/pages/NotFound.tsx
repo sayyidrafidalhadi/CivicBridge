@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="text-center">
-        <img src="/logo-square.jpg" alt={t('app.name')} className="mx-auto h-20 w-20" />
+        <span className="brand text-5xl text-gray-900">Nammude Shabdham</span>
         <h1 className="mt-6 text-6xl font-bold text-gray-900">404</h1>
         <p className="mt-4 text-xl text-gray-600">{t('error.notFound')}</p>
         <p className="mt-2 text-gray-500">{t('error.notFoundDesc')}</p>

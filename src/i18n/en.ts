@@ -109,7 +109,10 @@ export default {
     "underReview": "Under Review",
     "inProgress": "In Progress",
     "notFound": "Complaint not found",
-    "reportedBy": "Reported by {{name}}"
+    "reportedBy": "Reported by {{name}}",
+    "reportedByLabel": "Reported By",
+    "categoryLabel": "Category",
+    "resolutionSummary": "Resolution Summary"
   },
 
   "status": {
@@ -172,6 +175,7 @@ export default {
     "byCategory": "Complaints by Category",
     "byStatus": "Complaints by Status",
     "noData": "No data available",
+    "complaintRegistry": "Complaint Registry",
     "statusChanged": "{{name}} changed status from {{from}} → {{to}}",
     "loadError": "Failed to load dashboard",
     "updateError": "Failed to update status"
