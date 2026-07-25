@@ -1,20 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = 'https://mdorigiyjuxbjtbojwwu.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kb3JpZ2l5anV4Ymp0Ym9qd3d1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5OTM5MTEsImV4cCI6MjEwMDU2OTkxMX0.zj0A-A-hoz1OwYE4sJj7gpsBndLg2RiTLBuqMFAzEpc'
 
-export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey)
+export const isSupabaseConfigured = true
 
-let _supabase: SupabaseClient | null = null
-
-if (isSupabaseConfigured) {
-  _supabase = createClient(supabaseUrl!, supabaseAnonKey!)
-} else {
-  console.warn(
-    'Supabase not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env'
-  )
-}
+let _supabase: SupabaseClient | null = createClient(supabaseUrl, supabaseAnonKey)
 
 export function getSupabase(): SupabaseClient {
   if (!_supabase) {
