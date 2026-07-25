@@ -40,12 +40,25 @@ create table complaints (
   status text not null default 'submitted' check (status in ('submitted', 'under_review', 'in_progress', 'resolved')),
   assigned_to uuid not null references authorities(id) on delete cascade,
   user_id uuid not null references profiles(id) on delete cascade,
+  resolution_notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 alter table complaints enable row level security;
 
--- 4. Comments
+-- 4. Complaint action log (status update history)
+create table complaint_actions (
+  id uuid primary key default uuid_generate_v4(),
+  complaint_id uuid not null references complaints(id) on delete cascade,
+  officer_id uuid not null references profiles(id) on delete cascade,
+  from_status text check (from_status in ('submitted', 'under_review', 'in_progress', 'resolved')),
+  to_status text not null check (to_status in ('submitted', 'under_review', 'in_progress', 'resolved')),
+  notes text,
+  created_at timestamptz not null default now()
+);
+alter table complaint_actions enable row level security;
+
+-- 5. Comments
 create table comments (
   id uuid primary key default uuid_generate_v4(),
   complaint_id uuid not null references complaints(id) on delete cascade,
@@ -62,6 +75,7 @@ create index complaints_assigned_to_idx on complaints(assigned_to);
 create index complaints_case_number_idx on complaints(case_number);
 create index complaints_created_at_idx on complaints(created_at desc);
 create index comments_complaint_id_idx on comments(complaint_id);
+create index complaint_actions_complaint_id_idx on complaint_actions(complaint_id);
 create index profiles_authority_id_idx on profiles(authority_id);
 
 -- 6. Updated-at trigger
@@ -93,6 +107,14 @@ create policy "Officers can view assigned complaints" on complaints for select u
 create policy "Officers can update assigned complaints" on complaints for update using (
   exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('officer', 'admin') and (p.authority_id = complaints.assigned_to or p.role = 'admin'))
 );
+
+-- Complaint actions
+create policy "Anyone can view complaint actions"
+  on complaint_actions for select using (true);
+create policy "Officers can insert complaint actions"
+  on complaint_actions for insert with check (
+    exists (select 1 from profiles where id = auth.uid() and role in ('officer', 'admin'))
+  );
 
 -- Comments
 create policy "Anyone can view comments" on comments for select using (true);

@@ -1,5 +1,5 @@
 import { getSupabase, isSupabaseConfigured, isCloudinaryConfigured, cloudinaryCloudName, cloudinaryUploadPreset } from '../lib/supabase'
-import type { Complaint, ComplaintStatus } from '../types'
+import type { Complaint, ComplaintAction, ComplaintStatus } from '../types'
 import { getAuthorityByType } from './authorities'
 import { sendComplaintNotification } from './email'
 
@@ -93,19 +93,57 @@ export async function createComplaint(
 
 export async function updateComplaintStatus(
   id: string,
-  status: ComplaintStatus
+  status: ComplaintStatus,
+  notes?: string
 ) {
   const supabase = await getClient()
   if (!supabase) throw new Error('Supabase not configured')
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  // Get current complaint to know from_status
+  const { data: current } = await supabase
+    .from('complaints')
+    .select('status')
+    .eq('id', id)
+    .single()
+
+  const updateData: Record<string, string> = { status, updated_at: new Date().toISOString() }
+  if (notes) updateData.resolution_notes = notes
+
   const { data, error } = await supabase
     .from('complaints')
-    .update({ status, updated_at: new Date().toISOString() })
+    .update(updateData)
     .eq('id', id)
     .select()
     .single()
 
   if (error) throw error
+
+  // Log the action
+  await supabase.from('complaint_actions').insert({
+    complaint_id: id,
+    officer_id: user.id,
+    from_status: current?.status || null,
+    to_status: status,
+    notes: notes || null,
+  })
+
   return data as Complaint
+}
+
+export async function getComplaintActions(complaintId: string) {
+  const supabase = await getClient()
+  if (!supabase) return []
+  const { data, error } = await supabase
+    .from('complaint_actions')
+    .select('*, profiles(name)')
+    .eq('complaint_id', complaintId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data as (ComplaintAction & { profiles: { name: string } | null })[]
 }
 
 export async function uploadImage(file: File) {
