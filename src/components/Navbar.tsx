@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Landmark, Menu, X, FileText, PlusCircle, LayoutDashboard, LogOut } from 'lucide-react'
+import { Landmark, Menu, X, FileText, PlusCircle, LayoutDashboard, LogOut, Map, Settings as SettingsIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from './LanguageSwitcher'
 import type { Profile } from '../types'
 
 interface NavbarProps {
@@ -9,122 +11,113 @@ interface NavbarProps {
 }
 
 export default function Navbar({ user, onSignOut }: NavbarProps) {
+  const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
 
   const navLinks = [
-    { to: '/complaints', label: 'Complaints', icon: FileText },
-    ...(user ? [{ to: '/report', label: 'Report', icon: PlusCircle }] : []),
-    ...(user?.role === 'officer' ? [{ to: '/admin', label: 'Dashboard', icon: LayoutDashboard }] : []),
+    { to: '/complaints', label: t('nav.complaints'), icon: FileText },
+    { to: '/map', label: t('nav.map'), icon: Map },
+    ...(user ? [{ to: '/report', label: t('nav.report'), icon: PlusCircle }] : []),
+    ...(user?.role === 'officer' ? [{ to: '/admin', label: t('nav.dashboard'), icon: LayoutDashboard }] : []),
   ]
 
-  return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600">
-                <Landmark className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">CivicBridge</span>
-            </Link>
-            <div className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    location.pathname === link.to
-                      ? 'bg-emerald-50 text-emerald-700'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                  }`}
-                >
-                  <link.icon className="h-4 w-4" />
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="hidden md:flex items-center gap-3">
-            {user ? (
-              <>
-                <Link
-                  to="/dashboard"
-                  className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                >
-                  <LayoutDashboard className="h-4 w-4" />
-                  {user.name}
-                </Link>
-                <button
-                  onClick={onSignOut}
-                  className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/login"
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-              >
-                Sign In
-              </Link>
-            )}
-          </div>
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden rounded-lg p-2 text-gray-600 hover:bg-gray-100"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-      </div>
+  const isActive = (path: string) => path === '/complaints' ? location.pathname.startsWith(path) : location.pathname === path
 
-      {mobileOpen && (
-        <div className="border-t border-gray-200 md:hidden">
-          <div className="space-y-1 px-4 py-3">
+  return (
+    <nav className="sticky top-0 z-40 bg-gray-100 border-b border-gray-200 select-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-4">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-black text-white shadow-sm">
+                <Landmark className="w-5 h-5" />
+              </div>
+              <span className="text-xl font-bold text-gray-900">{t('app.name')}</span>
+            </Link>
+          </div>
+
+          <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${
-                  location.pathname === link.to
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'text-gray-600 hover:bg-gray-100'
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
+                  isActive(link.to) ? 'bg-gray-200 text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                 }`}
               >
-                <link.icon className="h-4 w-4" />
+                <link.icon className="w-3.5 h-3.5" />
                 {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+
+            {user ? (
+              <>
+                <Link to="/settings"
+                  className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition">
+                  <SettingsIcon className="w-3.5 h-3.5" />
+                </Link>
+                <Link to="/dashboard"
+                  className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition">
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  {user.name}
+                </Link>
+                <button onClick={onSignOut}
+                  className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition">
+                  <LogOut className="w-3.5 h-3.5" />
+                  {t('nav.signOut')}
+                </button>
+              </>
+            ) : (
+              <Link to="/login"
+                className="neo-btn-primary text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider">
+                {t('nav.signIn')}
+              </Link>
+            )}
+
+            <button onClick={() => setMobileOpen(!mobileOpen)}
+              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-200 transition">
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {mobileOpen && (
+        <div className="border-t border-gray-200 md:hidden bg-gray-100">
+          <div className="space-y-1 px-4 py-3">
+            <div className="mb-2"><LanguageSwitcher /></div>
+            {navLinks.map((link) => (
+              <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider ${
+                  isActive(link.to) ? 'bg-gray-200 text-gray-900' : 'text-gray-600 hover:bg-gray-200'
+                }`}>
+                <link.icon className="w-3.5 h-3.5" /> {link.label}
               </Link>
             ))}
             {user ? (
               <>
-                <Link
-                  to="/dashboard"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
-                >
-                  <LayoutDashboard className="h-4 w-4" />
-                  {user.name}
+                <Link to="/settings" onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-200">
+                  <SettingsIcon className="w-3.5 h-3.5" /> {t('nav.settings')}
                 </Link>
-                <button
-                  onClick={() => { onSignOut(); setMobileOpen(false) }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
+                <Link to="/dashboard" onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-200">
+                  <LayoutDashboard className="w-3.5 h-3.5" /> {user.name}
+                </Link>
+                <button onClick={() => { onSignOut(); setMobileOpen(false) }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-200">
+                  <LogOut className="w-3.5 h-3.5" /> {t('nav.signOut')}
                 </button>
               </>
             ) : (
-              <Link
-                to="/login"
-                onClick={() => setMobileOpen(false)}
-                className="block rounded-lg bg-emerald-600 px-4 py-2 text-center text-sm font-medium text-white"
-              >
-                Sign In
+              <Link to="/login" onClick={() => setMobileOpen(false)}
+                className="block rounded-lg neo-btn-primary text-white px-4 py-2 text-center text-xs font-bold uppercase tracking-wider">
+                {t('nav.signIn')}
               </Link>
             )}
           </div>

@@ -72,16 +72,7 @@ export interface Comment {
   user_id: string
   message: string
   created_at: string
+  profiles?: Pick<Profile, 'name'>
 }
 
-export const AUTHORITY_TYPES: { value: AuthorityType; label: string; icon: string }[] = [
-  { value: 'mla', label: 'MLA', icon: '🏛️' },
-  { value: 'mp', label: 'MP', icon: '🏛️' },
-  { value: 'ward_member', label: 'Ward Member', icon: '🏘️' },
-  { value: 'panchayat', label: 'Panchayat', icon: '🌾' },
-  { value: 'municipality', label: 'Municipality', icon: '🏙️' },
-  { value: 'corporation', label: 'Corporation', icon: '🏢' },
-  { value: 'water_authority', label: 'Water Authority', icon: '💧' },
-  { value: 'electricity_board', label: 'Electricity Board', icon: '⚡' },
-  { value: 'other', label: 'Other', icon: '📋' },
-]
+

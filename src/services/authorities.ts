@@ -26,15 +26,4 @@ export async function getAuthority(id: string) {
   return data as Authority
 }
 
-export async function getAuthorityByType(type: string) {
-  if (!isSupabaseConfigured) return null
-  const supabase = getSupabase()
-  const { data, error } = await supabase
-    .from('authorities')
-    .select('*')
-    .eq('type', type)
-    .maybeSingle()
 
-  if (error) throw error
-  return data as Authority | null
-}

@@ -1,6 +1,5 @@
 import { getSupabase, isSupabaseConfigured, isCloudinaryConfigured, cloudinaryCloudName, cloudinaryUploadPreset } from '../lib/supabase'
 import type { Complaint, ComplaintAction, ComplaintStatus } from '../types'
-import { getAuthorityByType } from './authorities'
 import { sendComplaintNotification } from './email'
 
 async function getClient() {
@@ -8,16 +7,19 @@ async function getClient() {
   return getSupabase()
 }
 
-export async function getComplaints() {
+export async function getComplaints(page = 1, pageSize = 20) {
   const supabase = await getClient()
-  if (!supabase) return []
-  const { data, error } = await supabase
+  if (!supabase) return { data: [], count: 0 }
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  const { data, error, count } = await supabase
     .from('complaints')
-    .select('*, profiles(name), authorities(name, type)')
+    .select('*, profiles(name), authorities(name, type)', { count: 'exact' })
     .order('created_at', { ascending: false })
+    .range(from, to)
 
   if (error) throw error
-  return data as (Complaint & { profiles: { name: string } | null; authorities: { name: string; type: string } | null })[]
+  return { data: data as (Complaint & { profiles: { name: string } | null; authorities: { name: string; type: string } | null })[], count: count || 0 }
 }
 
 export async function getComplaintsByAuthority(authorityId: string) {
