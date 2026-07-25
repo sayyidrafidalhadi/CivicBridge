@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import { Landmark, LogIn, UserPlus } from 'lucide-react'
+import { LogIn, UserPlus } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import type { Role } from '../types'
 
@@ -41,9 +41,7 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="neo-card p-8">
           <div className="text-center mb-8">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-black shadow-lg">
-              <Landmark className="h-6 w-6 text-white" />
-            </div>
+            <img src="/logo-square.jpg" alt={t('app.name')} className="mx-auto h-14 w-14" />
             <h2 className="mt-4 text-2xl font-bold text-gray-900">
               {isSignUp ? t('auth.createAccount') : t('auth.welcomeBack')}
             </h2>

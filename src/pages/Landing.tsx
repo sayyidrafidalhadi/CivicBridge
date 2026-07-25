@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Landmark, PlusCircle, Eye, CheckCircle2, ArrowRight } from 'lucide-react'
+import { PlusCircle, Eye, CheckCircle2, ArrowRight } from 'lucide-react'
 
 export default function Landing() {
   const { t } = useTranslation()
@@ -16,12 +16,7 @@ export default function Landing() {
       <section className="relative overflow-hidden bg-gray-100">
         <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-black shadow-lg">
-              <Landmark className="h-8 w-8 text-white" />
-            </div>
-            <h1 className="mt-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-              {t('app.name')}
-            </h1>
+            <img src="/logo-square.jpg" alt={t('app.name')} className="mx-auto h-20 w-20" />
             <p className="mt-6 text-lg leading-8 text-gray-600">
               {t('landing.heroDesc')}
             </p>
@@ -60,9 +55,7 @@ export default function Landing() {
 
       <section className="bg-gray-900 py-20">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-white">
-            <Landmark className="h-7 w-7 text-gray-900" />
-          </div>
+          <img src="/logo-square.jpg" alt={t('app.name')} className="mx-auto h-16 w-16" />
           <h2 className="mt-6 text-3xl font-bold text-white">
             {t('landing.ctaTitle')}
           </h2>

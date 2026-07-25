@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Landmark, Menu, X, FileText, PlusCircle, LayoutDashboard, LogOut, Map, Settings as SettingsIcon } from 'lucide-react'
+import { Menu, X, FileText, PlusCircle, LayoutDashboard, LogOut, Map, Settings as SettingsIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from './LanguageSwitcher'
@@ -30,10 +30,7 @@ export default function Navbar({ user, onSignOut }: NavbarProps) {
         <div className="flex items-center justify-between h-16 gap-4">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-black text-white shadow-sm">
-                <Landmark className="w-5 h-5" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">{t('app.name')}</span>
+              <img src="/logo-wide.jpg" alt={t('app.name')} className="h-10" />
             </Link>
           </div>
 

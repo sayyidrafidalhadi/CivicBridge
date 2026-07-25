@@ -1,15 +1,13 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Landmark, Home } from 'lucide-react'
+import { Home } from 'lucide-react'
 
 export default function NotFound() {
   const { t } = useTranslation()
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-black shadow-lg">
-          <Landmark className="h-8 w-8 text-white" />
-        </div>
+        <img src="/logo-square.jpg" alt={t('app.name')} className="mx-auto h-20 w-20" />
         <h1 className="mt-6 text-6xl font-bold text-gray-900">404</h1>
         <p className="mt-4 text-xl text-gray-600">{t('error.notFound')}</p>
         <p className="mt-2 text-gray-500">{t('error.notFoundDesc')}</p>
