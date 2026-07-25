@@ -1,9 +1,12 @@
--- CivicBridge Database Schema
--- Fresh install — run the entire file in the SQL Editor
+-- CivicBridge Database Schema — Fresh Install
+-- Run this file in the Supabase SQL Editor
+
+-- 0. Extensions
+create extension if not exists "uuid-ossp";
 
 -- 1. Authorities
 create table authorities (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key default uuid_generate_v4(),
   name text not null,
   type text not null check (type in ('mla','mp','ward_member','panchayat','municipality','corporation','water_authority','electricity_board','other')),
   jurisdiction text not null default '',
@@ -26,7 +29,7 @@ alter table profiles enable row level security;
 
 -- 3. Complaints
 create table complaints (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key default uuid_generate_v4(),
   case_number text not null unique,
   title text not null,
   description text not null,
@@ -44,7 +47,7 @@ alter table complaints enable row level security;
 
 -- 4. Comments
 create table comments (
-  id uuid primary key default gen_random_uuid(),
+  id uuid primary key default uuid_generate_v4(),
   complaint_id uuid not null references complaints(id) on delete cascade,
   user_id uuid not null references profiles(id) on delete cascade,
   message text not null,
@@ -63,67 +66,37 @@ create index profiles_authority_id_idx on profiles(authority_id);
 
 -- 6. Updated-at trigger
 create or replace function update_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
+returns trigger as $$ begin new.updated_at = now(); return new; end; $$ language plpgsql;
 create trigger complaints_updated_at
-  before update on complaints
-  for each row execute function update_updated_at();
+  before update on complaints for each row execute function update_updated_at();
 
 -- 7. RLS Policies
 -- Authorities
-create policy "Anyone can view authorities"
-  on authorities for select using (true);
+create policy "Anyone can view authorities" on authorities for select using (true);
 
 -- Profiles
-create policy "Anyone can view profiles"
-  on profiles for select using (true);
-create policy "Users can insert own profile"
-  on profiles for insert with check (auth.uid() = id);
-create policy "Users can update own profile"
-  on profiles for update using (auth.uid() = id);
+create policy "Anyone can view profiles" on profiles for select using (true);
+create policy "Users can insert own profile" on profiles for insert with check (auth.uid() = id);
+create policy "Users can update own profile" on profiles for update using (auth.uid() = id);
 
 -- Complaints
-create policy "Anyone can view complaints"
-  on complaints for select using (true);
-create policy "Citizens can create complaints"
-  on complaints for insert with check (
-    auth.uid() = user_id
-    and exists (select 1 from profiles where id = auth.uid() and role in ('citizen', 'admin'))
-  );
-create policy "Citizens can update own complaints"
-  on complaints for update using (
-    auth.uid() = user_id
-    and exists (select 1 from profiles where id = auth.uid() and role in ('citizen', 'admin'))
-  );
-create policy "Officers can view assigned complaints"
-  on complaints for select using (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid()
-      and p.role in ('officer', 'admin')
-      and (p.authority_id = complaints.assigned_to or p.role = 'admin')
-    )
-  );
-create policy "Officers can update assigned complaints"
-  on complaints for update using (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid()
-      and p.role in ('officer', 'admin')
-      and (p.authority_id = complaints.assigned_to or p.role = 'admin')
-    )
-  );
+create policy "Anyone can view complaints" on complaints for select using (true);
+create policy "Citizens can create complaints" on complaints for insert with check (
+  auth.uid() = user_id and exists (select 1 from profiles where id = auth.uid() and role in ('citizen', 'admin'))
+);
+create policy "Citizens can update own complaints" on complaints for update using (
+  auth.uid() = user_id and exists (select 1 from profiles where id = auth.uid() and role in ('citizen', 'admin'))
+);
+create policy "Officers can view assigned complaints" on complaints for select using (
+  exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('officer', 'admin') and (p.authority_id = complaints.assigned_to or p.role = 'admin'))
+);
+create policy "Officers can update assigned complaints" on complaints for update using (
+  exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('officer', 'admin') and (p.authority_id = complaints.assigned_to or p.role = 'admin'))
+);
 
 -- Comments
-create policy "Anyone can view comments"
-  on comments for select using (true);
-create policy "Authenticated users can comment"
-  on comments for insert with check (auth.role() = 'authenticated');
+create policy "Anyone can view comments" on comments for select using (true);
+create policy "Authenticated users can comment" on comments for insert with check (auth.role() = 'authenticated');
 
 -- 8. Seed authorities
 insert into authorities (name, type, jurisdiction, email) values
@@ -139,10 +112,5 @@ insert into authorities (name, type, jurisdiction, email) values
 insert into storage.buckets (id, name, public)
 values ('complaint-images', 'complaint-images', true)
 on conflict (id) do nothing;
-
-create policy "Anyone can view complaint images"
-  on storage.objects for select using (bucket_id = 'complaint-images');
-create policy "Authenticated users can upload images"
-  on storage.objects for insert with check (
-    bucket_id = 'complaint-images' and auth.role() = 'authenticated'
-  );
+create policy "Anyone can view complaint images" on storage.objects for select using (bucket_id = 'complaint-images');
+create policy "Authenticated users can upload images" on storage.objects for insert with check (bucket_id = 'complaint-images' and auth.role() = 'authenticated');
