@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useAuth } from './hooks/useAuth'
+import { isConfigured } from './lib/supabase'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import LoadingSpinner from './components/LoadingSpinner'
@@ -37,6 +38,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="flex min-h-screen flex-col bg-gray-50">
+        {!isConfigured && (
+          <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 text-center text-sm text-amber-800">
+            ⚠️ Supabase not configured. Set{' '}
+            <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">VITE_SUPABASE_URL</code> and{' '}
+            <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">VITE_SUPABASE_ANON_KEY</code>{' '}
+            in <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">.env</code>
+          </div>
+        )}
         <Navbar user={user} onSignOut={signOut} />
         <main className="flex-1">
           <Routes>
@@ -44,8 +53,8 @@ export default function App() {
             <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
-            <Route path="/complaints" element={<Complaints />} />
-            <Route path="/complaints/:id" element={<ComplaintDetails />} />
+            <Route path="/complaints" element={isConfigured ? <Complaints /> : <Navigate to="/" />} />
+            <Route path="/complaints/:id" element={isConfigured ? <ComplaintDetails /> : <Navigate to="/" />} />
             <Route path="/admin" element={<ProtectedRoute role="officer"><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

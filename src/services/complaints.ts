@@ -1,7 +1,14 @@
-import { supabase } from '../lib/supabase'
+import { getSupabase, isConfigured } from '../lib/supabase'
 import type { Complaint, ComplaintStatus } from '../types'
 
+async function getClient() {
+  if (!isConfigured) return null
+  return getSupabase()
+}
+
 export async function getComplaints() {
+  const supabase = await getClient()
+  if (!supabase) return []
   const { data, error } = await supabase
     .from('complaints')
     .select('*, profiles(name)')
@@ -12,6 +19,8 @@ export async function getComplaints() {
 }
 
 export async function getComplaint(id: string) {
+  const supabase = await getClient()
+  if (!supabase) throw new Error('Supabase not configured')
   const { data, error } = await supabase
     .from('complaints')
     .select('*, profiles(name)')
@@ -25,6 +34,8 @@ export async function getComplaint(id: string) {
 export async function createComplaint(
   complaint: Omit<Complaint, 'id' | 'created_at' | 'updated_at' | 'status'>
 ) {
+  const supabase = await getClient()
+  if (!supabase) throw new Error('Supabase not configured')
   const { data, error } = await supabase
     .from('complaints')
     .insert({
@@ -42,6 +53,8 @@ export async function updateComplaintStatus(
   id: string,
   status: ComplaintStatus
 ) {
+  const supabase = await getClient()
+  if (!supabase) throw new Error('Supabase not configured')
   const { data, error } = await supabase
     .from('complaints')
     .update({ status, updated_at: new Date().toISOString() })
@@ -54,6 +67,8 @@ export async function updateComplaintStatus(
 }
 
 export async function uploadImage(file: File) {
+  const supabase = await getClient()
+  if (!supabase) throw new Error('Supabase not configured')
   const fileExt = file.name.split('.').pop()
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
   const filePath = `${fileName}`
@@ -64,9 +79,7 @@ export async function uploadImage(file: File) {
 
   if (error) throw error
 
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from('complaint-images').getPublicUrl(data.path)
+  const { data: { publicUrl } } = supabase.storage.from('complaint-images').getPublicUrl(data.path)
 
   return publicUrl
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { getSupabase, isConfigured } from '../lib/supabase'
 import type { Profile, Role } from '../types'
 
 export function useAuth() {
@@ -7,6 +7,12 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!isConfigured) {
+      setLoading(false)
+      return
+    }
+
+    const supabase = getSupabase()
     let cancelled = false
 
     const getSession = async () => {
@@ -19,7 +25,7 @@ export function useAuth() {
             .select('*')
             .eq('id', session.user.id)
             .single()
-          if (!cancelled) setUser(data as Profile)
+          if (!cancelled) setUser(data as unknown as Profile)
         }
       } catch {
         console.warn('Auth: no session available')
@@ -39,7 +45,7 @@ export function useAuth() {
             .select('*')
             .eq('id', session.user.id)
             .single()
-          if (!cancelled) setUser(data as Profile)
+          if (!cancelled) setUser(data as unknown as Profile)
         } else {
           setUser(null)
         }
@@ -55,11 +61,15 @@ export function useAuth() {
   }, [])
 
   const signIn = async (email: string, password: string) => {
+    if (!isConfigured) throw new Error('Supabase not configured')
+    const supabase = getSupabase()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
   }
 
   const signUp = async (email: string, password: string, name: string, role: Role) => {
+    if (!isConfigured) throw new Error('Supabase not configured')
+    const supabase = getSupabase()
     const { data, error } = await supabase.auth.signUp({ email, password })
     if (error) throw error
 
@@ -75,6 +85,8 @@ export function useAuth() {
   }
 
   const signOut = async () => {
+    if (!isConfigured) return
+    const supabase = getSupabase()
     await supabase.auth.signOut()
   }
 
