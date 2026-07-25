@@ -7,35 +7,51 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let cancelled = false
+
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-        setUser(data as Profile)
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (cancelled) return
+        if (session?.user) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+          if (!cancelled) setUser(data as Profile)
+        }
+      } catch {
+        console.warn('Auth: no session available')
+      } finally {
+        if (!cancelled) setLoading(false)
       }
-      setLoading(false)
     }
 
     getSession()
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-        setUser(data as Profile)
-      } else {
-        setUser(null)
+      if (cancelled) return
+      try {
+        if (session?.user) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+          if (!cancelled) setUser(data as Profile)
+        } else {
+          setUser(null)
+        }
+      } catch {
+        console.warn('Auth: profile fetch failed')
       }
     })
 
-    return () => listener?.subscription.unsubscribe()
+    return () => {
+      cancelled = true
+      listener?.subscription.unsubscribe()
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {
