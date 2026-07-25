@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
+import { AnimatePresence } from 'framer-motion'
 import {
   AlertCircle, CheckCircle2, Clock, FileText, Filter,
-  X, Search, Building2, MapPin, Calendar, User, BarChart3,
-  ShieldAlert, Eye, ChevronDown, ChevronUp
+  X, Search, Building2, Calendar, User, BarChart3,
+  ShieldAlert, Eye
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import type { Complaint, ComplaintStatus, Authority, ComplaintAction } from '../types'
