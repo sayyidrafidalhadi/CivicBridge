@@ -1,5 +1,5 @@
 -- CivicBridge Database Schema v2
--- Idempotent migration — safe to run on existing tables
+-- Safe to run on existing tables — uses ADD COLUMN IF NOT EXISTS
 
 -- 0. Extensions
 create extension if not exists "uuid-ossp";
@@ -29,47 +29,27 @@ create table if not exists profiles (
 
 alter table profiles enable row level security;
 
--- 3. Complaints table — alter existing if needed
-create table if not exists complaints (
-  id uuid primary key default uuid_generate_v4(),
-  case_number text,
-  title text not null,
-  description text not null,
-  category text not null,
-  image_url text,
-  latitude double precision,
-  longitude double precision,
-  status text not null default 'submitted' check (status in ('submitted', 'under_review', 'in_progress', 'resolved')),
-  assigned_to uuid,
-  user_id uuid not null references profiles(id) on delete cascade,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
+-- 3. Migrate existing complaints table
+-- Add columns one by one (safe for existing tables)
+alter table complaints add column if not exists case_number text;
+alter table complaints add column if not exists assigned_to uuid;
 
--- Add columns if table already existed without them
-do $$
-begin
-  if not exists (select 1 from information_schema.columns where table_name = 'complaints' and column_name = 'case_number') then
-    alter table complaints add column case_number text;
-  end if;
-  if not exists (select 1 from information_schema.columns where table_name = 'complaints' and column_name = 'assigned_to') then
-    alter table complaints add column assigned_to uuid references authorities(id) on delete cascade;
-  end if;
-end $$;
-
--- Add unique constraint on case_number if not exists
-do $$
-begin
-  if not exists (select 1 from information_schema.table_constraints where constraint_name = 'unique_case_number') then
-    alter table complaints add constraint unique_case_number unique (case_number);
-  end if;
-end $$;
-
--- Migrate old data: set a default case_number for rows that don't have one
+-- Backfill case numbers for existing rows
 update complaints set case_number = 'CB-' || to_char(created_at, 'YYYY') || '-' || upper(substr(md5(id::text), 1, 6)) where case_number is null;
 
--- Make case_number not null going forward
+-- Now enforce NOT NULL
 alter table complaints alter column case_number set not null;
+
+-- Add foreign key for assigned_to
+do $$
+begin
+  if not exists (select 1 from information_schema.table_constraints where constraint_name = 'complaints_assigned_to_fkey') then
+    alter table complaints add constraint complaints_assigned_to_fkey foreign key (assigned_to) references authorities(id) on delete cascade;
+  end if;
+end $$;
+
+-- Unique case_number
+alter table complaints add constraint unique_case_number unique (case_number);
 
 alter table complaints enable row level security;
 
@@ -84,7 +64,7 @@ create table if not exists comments (
 
 alter table comments enable row level security;
 
--- 5. Indexes (IF NOT EXISTS is not supported, using safe approach)
+-- 5. Indexes
 create index if not exists complaints_status_idx on complaints(status);
 create index if not exists complaints_user_id_idx on complaints(user_id);
 create index if not exists complaints_assigned_to_idx on complaints(assigned_to);
@@ -110,11 +90,16 @@ create trigger complaints_updated_at
 -- 7. Row Level Security Policies
 
 -- Authorities
+drop policy if exists "Anyone can view authorities" on authorities;
 create policy "Anyone can view authorities"
   on authorities for select
   using (true);
 
 -- Profiles
+drop policy if exists "Anyone can view profiles" on profiles;
+drop policy if exists "Users can insert own profile" on profiles;
+drop policy if exists "Users can update own profile" on profiles;
+
 create policy "Anyone can view profiles"
   on profiles for select
   using (true);
@@ -127,8 +112,7 @@ create policy "Users can update own profile"
   on profiles for update
   using (auth.uid() = id);
 
--- Complaints
--- Drop old policies first to avoid conflicts
+-- Complaints (drop old to avoid conflicts)
 drop policy if exists "Anyone can view complaints" on complaints;
 drop policy if exists "Citizens can create complaints" on complaints;
 drop policy if exists "Citizens can update own complaints" on complaints;
@@ -184,6 +168,9 @@ create policy "Officers can update assigned complaints"
   );
 
 -- Comments
+drop policy if exists "Anyone can view comments" on comments;
+drop policy if exists "Authenticated users can comment" on comments;
+
 create policy "Anyone can view comments"
   on comments for select
   using (true);
