@@ -26,8 +26,24 @@ export default {
     "step3Title": "Resolve",
     "step3Desc": "Authorities review, take action, and update the status until resolved",
     "ctaTitle": "Ready to make a difference?",
-    "ctaDesc": "Join CivicBridge and help build a more transparent community.",
-    "getStarted": "Get Started"
+    "ctaDesc": "Join Nammude Shabdham and help build a more transparent community.",
+    "getStarted": "Get Started",
+    "statsTitle": "Our Impact",
+    "statComplaints": "Complaints Filed",
+    "statResolved": "Resolved",
+    "statAuthorities": "Authorities",
+    "statCitizens": "Active Citizens",
+    "benefitsTitle": "Why Nammude Shabdham",
+    "benefit1Title": "Transparent Process",
+    "benefit1Desc": "Every complaint is tracked from submission to resolution. Citizens can see exactly where their issue stands at any time.",
+    "benefit2Title": "Direct Accountability",
+    "benefit2Desc": "Complaints are routed to the correct authority. Officers are responsible for updating status and providing resolution notes.",
+    "benefit3Title": "Community Driven",
+    "benefit3Desc": "All complaints are publicly visible. The community can follow along, comment, and hold authorities accountable together.",
+    "benefit4Title": "Real-time Updates",
+    "benefit4Desc": "Get instant notifications when your complaint status changes. Comments and status updates appear in real time.",
+    "authoritiesTitle": "Who We Work With",
+    "authoritiesDesc": "Complaints are routed to the appropriate authority for action"
   },
 
   "auth": {
