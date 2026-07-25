@@ -18,13 +18,16 @@ if (isSupabaseConfigured) {
 
 export function getSupabase(): SupabaseClient {
   if (!_supabase) {
-    throw new Error('Supabase not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env')
+    throw new Error('Supabase not configured')
   }
   return _supabase
 }
 
-// Cloudinary config
+// Cloudinary
 export const cloudinaryCloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
 export const cloudinaryUploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
-
 export const isCloudinaryConfigured = !!(cloudinaryCloudName && cloudinaryUploadPreset)
+
+// EmailJSON
+export const emailJsonUrl = import.meta.env.VITE_EMAILJSON_URL
+export const isEmailJsonConfigured = !!emailJsonUrl

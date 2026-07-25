@@ -40,7 +40,7 @@ export default function App() {
       <div className="flex min-h-screen flex-col bg-gray-50">
         {!isSupabaseConfigured && (
           <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 text-center text-sm text-amber-800">
-            ⚠️ Supabase not configured. Set{' '}
+            Supabase not configured. Set{' '}
             <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">VITE_SUPABASE_URL</code> and{' '}
             <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">VITE_SUPABASE_ANON_KEY</code>{' '}
             in <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">.env</code>
@@ -53,8 +53,8 @@ export default function App() {
             <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
-            <Route path="/complaints" element={isSupabaseConfigured ? <Complaints /> : <Navigate to="/" />} />
-            <Route path="/complaints/:id" element={isSupabaseConfigured ? <ComplaintDetails /> : <Navigate to="/" />} />
+            <Route path="/complaints" element={<Complaints />} />
+            <Route path="/complaints/:id" element={<ComplaintDetails />} />
             <Route path="/admin" element={<ProtectedRoute role="officer"><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

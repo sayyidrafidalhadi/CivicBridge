@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
+import { ArrowLeft, Calendar, Building2, User } from 'lucide-react'
 import type { Complaint } from '../types'
 import StatusBadge from '../components/StatusBadge'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -18,7 +19,7 @@ const icon = L.icon({
 
 export default function ComplaintDetails() {
   const { id } = useParams()
-  const [complaint, setComplaint] = useState<(Complaint & { profiles?: { name: string } | null }) | null>(null)
+  const [complaint, setComplaint] = useState<(Complaint & { profiles?: { name: string } | null; authorities?: { name: string; type: string } | null }) | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -41,10 +42,9 @@ export default function ComplaintDetails() {
   if (!complaint) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <span className="text-5xl">🔍</span>
-        <h2 className="mt-4 text-2xl font-bold text-gray-900">Complaint not found</h2>
-        <Link to="/complaints" className="mt-4 inline-block text-emerald-600 hover:text-emerald-700">
-          ← Back to complaints
+        <h2 className="text-2xl font-bold text-gray-900">Complaint not found</h2>
+        <Link to="/complaints" className="mt-4 inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700">
+          <ArrowLeft className="h-4 w-4" /> Back to complaints
         </Link>
       </div>
     )
@@ -52,20 +52,39 @@ export default function ComplaintDetails() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <Link to="/complaints" className="text-sm text-emerald-600 hover:text-emerald-700">
-        ← Back to complaints
+      <Link to="/complaints" className="inline-flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700">
+        <ArrowLeft className="h-4 w-4" /> Back to complaints
       </Link>
 
       <div className="mt-6">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-3xl font-bold text-gray-900">{complaint.title}</h1>
+          <div>
+            <span className="inline-block rounded-md bg-emerald-50 px-2.5 py-1 font-mono text-xs font-medium text-emerald-700">
+              {complaint.case_number}
+            </span>
+            <h1 className="mt-3 text-3xl font-bold text-gray-900">{complaint.title}</h1>
+          </div>
           <StatusBadge status={complaint.status} />
         </div>
 
         <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-500">
-          <span className="font-medium text-gray-700">{complaint.category}</span>
-          <span>Reported by {complaint.profiles?.name || 'Anonymous'}</span>
-          <span>{formatDate(complaint.created_at)}</span>
+          <span className="flex items-center gap-1.5">
+            <Building2 className="h-4 w-4" />
+            {complaint.category}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <User className="h-4 w-4" />
+            {complaint.profiles?.name || 'Anonymous'}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Calendar className="h-4 w-4" />
+            {formatDate(complaint.created_at)}
+          </span>
+          {complaint.authorities && (
+            <span className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+              {complaint.authorities.name}
+            </span>
+          )}
         </div>
       </div>
 
@@ -121,8 +140,8 @@ export default function ComplaintDetails() {
 function StatusTimeline({ status, created, updated }: { status: string; created: string; updated: string }) {
   const steps = [
     { key: 'submitted', label: 'Submitted', time: created },
-    { key: 'under_review', label: 'Under Review', time: status === 'under_review' || status === 'in_progress' || status === 'resolved' ? updated : null },
-    { key: 'in_progress', label: 'In Progress', time: status === 'in_progress' || status === 'resolved' ? updated : null },
+    { key: 'under_review', label: 'Under Review', time: ['under_review', 'in_progress', 'resolved'].includes(status) ? updated : null },
+    { key: 'in_progress', label: 'In Progress', time: ['in_progress', 'resolved'].includes(status) ? updated : null },
     { key: 'resolved', label: 'Resolved', time: status === 'resolved' ? updated : null },
   ]
 
@@ -137,7 +156,7 @@ function StatusTimeline({ status, created, updated }: { status: string; created:
           <div key={step.key} className="flex gap-4">
             <div className="flex flex-col items-center">
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition ${
                   isActive
                     ? 'bg-emerald-600 text-white'
                     : 'bg-gray-200 text-gray-500'
@@ -147,18 +166,14 @@ function StatusTimeline({ status, created, updated }: { status: string; created:
               </div>
               {!isLast && (
                 <div
-                  className={`mt-1 w-0.5 flex-1 ${
+                  className={`mt-1 w-0.5 flex-1 transition ${
                     i < currentIndex ? 'bg-emerald-600' : 'bg-gray-200'
                   }`}
                 />
               )}
             </div>
             <div className="pb-4">
-              <p
-                className={`font-medium ${
-                  isActive ? 'text-gray-900' : 'text-gray-500'
-                }`}
-              >
+              <p className={`font-medium ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>
                 {step.label}
               </p>
               {step.time && (

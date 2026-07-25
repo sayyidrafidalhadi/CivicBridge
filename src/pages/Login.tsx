@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { Landmark, LogIn, UserPlus } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import type { Role } from '../types'
 
@@ -38,7 +39,9 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
           <div className="text-center mb-8">
-            <span className="text-4xl">🏛️</span>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100">
+              <Landmark className="h-6 w-6 text-emerald-600" />
+            </div>
             <h2 className="mt-4 text-2xl font-bold text-gray-900">
               {isSignUp ? 'Create Account' : 'Welcome Back'}
             </h2>
@@ -103,13 +106,15 @@ export default function Login() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
             >
-              {submitting
-                ? 'Please wait...'
-                : isSignUp
-                  ? 'Create Account'
-                  : 'Sign In'}
+              {submitting ? (
+                'Please wait...'
+              ) : isSignUp ? (
+                <><UserPlus className="h-4 w-4" /> Create Account</>
+              ) : (
+                <><LogIn className="h-4 w-4" /> Sign In</>
+              )}
             </button>
           </form>
 

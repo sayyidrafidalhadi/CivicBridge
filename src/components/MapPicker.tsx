@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
+import { Navigation } from 'lucide-react'
 import L from 'leaflet'
 
 const icon = L.icon({
@@ -31,9 +32,7 @@ function SetViewOnLocation({ lat, lng }: { lat: number; lng: number }) {
   return null
 }
 
-export default function MapPicker({
-  onLocationSelect,
-}: MapPickerProps) {
+export default function MapPicker({ onLocationSelect }: MapPickerProps) {
   const [position, setPosition] = useState<[number, number] | null>(null)
   const [gettingLocation, setGettingLocation] = useState(false)
 
@@ -67,10 +66,11 @@ export default function MapPicker({
         <button
           type="button"
           onClick={getLocation}
-          className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700"
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 transition disabled:opacity-50"
           disabled={gettingLocation}
         >
-          📍 {gettingLocation ? 'Getting location...' : 'Use My Location'}
+          <Navigation className={`h-4 w-4 ${gettingLocation ? 'animate-spin' : ''}`} />
+          {gettingLocation ? 'Getting location...' : 'Use My Location'}
         </button>
         <div className="h-64 rounded-lg overflow-hidden border border-gray-200">
           <MapContainer
