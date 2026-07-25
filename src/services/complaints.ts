@@ -1,8 +1,8 @@
-import { getSupabase, isConfigured } from '../lib/supabase'
+import { getSupabase, isSupabaseConfigured, isCloudinaryConfigured, cloudinaryCloudName, cloudinaryUploadPreset } from '../lib/supabase'
 import type { Complaint, ComplaintStatus } from '../types'
 
 async function getClient() {
-  if (!isConfigured) return null
+  if (!isSupabaseConfigured) return null
   return getSupabase()
 }
 
@@ -32,14 +32,19 @@ export async function getComplaint(id: string) {
 }
 
 export async function createComplaint(
-  complaint: Omit<Complaint, 'id' | 'created_at' | 'updated_at' | 'status'>
+  complaint: Omit<Complaint, 'id' | 'created_at' | 'updated_at' | 'status' | 'user_id'>
 ) {
   const supabase = await getClient()
   if (!supabase) throw new Error('Supabase not configured')
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('You must be signed in to submit a complaint')
+
   const { data, error } = await supabase
     .from('complaints')
     .insert({
       ...complaint,
+      user_id: user.id,
       status: 'submitted',
     })
     .select()
@@ -67,8 +72,30 @@ export async function updateComplaintStatus(
 }
 
 export async function uploadImage(file: File) {
+  // Use Cloudinary if configured
+  if (isCloudinaryConfigured && cloudinaryCloudName && cloudinaryUploadPreset) {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('upload_preset', cloudinaryUploadPreset)
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`,
+      { method: 'POST', body: formData }
+    )
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error?.message || 'Cloudinary upload failed')
+    }
+
+    const result = await response.json()
+    return result.secure_url
+  }
+
+  // Fallback to Supabase Storage
   const supabase = await getClient()
-  if (!supabase) throw new Error('Supabase not configured')
+  if (!supabase) throw new Error('No image storage configured')
+
   const fileExt = file.name.split('.').pop()
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
   const filePath = `${fileName}`

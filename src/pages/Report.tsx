@@ -33,7 +33,6 @@ export default function Report() {
         image_url,
         latitude,
         longitude,
-        user_id: '',
       })
 
       toast.success('Complaint reported successfully!')

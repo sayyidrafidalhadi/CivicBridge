@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useAuth } from './hooks/useAuth'
-import { isConfigured } from './lib/supabase'
+import { isSupabaseConfigured } from './lib/supabase'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import LoadingSpinner from './components/LoadingSpinner'
@@ -38,7 +38,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="flex min-h-screen flex-col bg-gray-50">
-        {!isConfigured && (
+        {!isSupabaseConfigured && (
           <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 text-center text-sm text-amber-800">
             ⚠️ Supabase not configured. Set{' '}
             <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">VITE_SUPABASE_URL</code> and{' '}
@@ -53,8 +53,8 @@ export default function App() {
             <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
-            <Route path="/complaints" element={isConfigured ? <Complaints /> : <Navigate to="/" />} />
-            <Route path="/complaints/:id" element={isConfigured ? <ComplaintDetails /> : <Navigate to="/" />} />
+            <Route path="/complaints" element={isSupabaseConfigured ? <Complaints /> : <Navigate to="/" />} />
+            <Route path="/complaints/:id" element={isSupabaseConfigured ? <ComplaintDetails /> : <Navigate to="/" />} />
             <Route path="/admin" element={<ProtectedRoute role="officer"><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

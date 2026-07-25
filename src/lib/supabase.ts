@@ -4,11 +4,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const isConfigured = !!(supabaseUrl && supabaseAnonKey)
+export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey)
 
 let _supabase: SupabaseClient | null = null
 
-if (isConfigured) {
+if (isSupabaseConfigured) {
   _supabase = createClient(supabaseUrl!, supabaseAnonKey!)
 } else {
   console.warn(
@@ -22,3 +22,9 @@ export function getSupabase(): SupabaseClient {
   }
   return _supabase
 }
+
+// Cloudinary config
+export const cloudinaryCloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+export const cloudinaryUploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+
+export const isCloudinaryConfigured = !!(cloudinaryCloudName && cloudinaryUploadPreset)

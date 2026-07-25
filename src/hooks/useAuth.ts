@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getSupabase, isConfigured } from '../lib/supabase'
+import { getSupabase, isSupabaseConfigured } from '../lib/supabase'
 import type { Profile, Role } from '../types'
 
 export function useAuth() {
@@ -7,7 +7,7 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!isConfigured) {
+    if (!isSupabaseConfigured) {
       setLoading(false)
       return
     }
@@ -61,14 +61,14 @@ export function useAuth() {
   }, [])
 
   const signIn = async (email: string, password: string) => {
-    if (!isConfigured) throw new Error('Supabase not configured')
+    if (!isSupabaseConfigured) throw new Error('Supabase not configured')
     const supabase = getSupabase()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
   }
 
   const signUp = async (email: string, password: string, name: string, role: Role) => {
-    if (!isConfigured) throw new Error('Supabase not configured')
+    if (!isSupabaseConfigured) throw new Error('Supabase not configured')
     const supabase = getSupabase()
     const { data, error } = await supabase.auth.signUp({ email, password })
     if (error) throw error
@@ -85,7 +85,7 @@ export function useAuth() {
   }
 
   const signOut = async () => {
-    if (!isConfigured) return
+    if (!isSupabaseConfigured) return
     const supabase = getSupabase()
     await supabase.auth.signOut()
   }
