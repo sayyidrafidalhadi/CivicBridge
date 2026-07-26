@@ -14,7 +14,7 @@ export default defineConfig({
         name: 'Nammude Shabdham',
         short_name: 'Nammude',
         description: 'Participatory Governance & Public Accountability Platform',
-        theme_color: '#059669',
+        theme_color: '#000000',
         background_color: '#f9fafb',
         display: 'standalone',
         start_url: '/',
