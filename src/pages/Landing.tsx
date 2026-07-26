@@ -2,12 +2,44 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   PlusCircle, Eye, CheckCircle2, ArrowRight, FileText,
-  ShieldCheck, Users, Building2, Route, GitBranch, Bell
+  ShieldCheck, Users, Building2, Route, GitBranch, Bell,
+  Droplets, Trash2, Car, Lightbulb, Wifi, Leaf, HelpCircle,
+  Landmark, Globe, Monitor, ChevronDown
 } from 'lucide-react'
 
 const authorityTypes = [
   'mla', 'mp', 'ward_member', 'panchayat',
   'municipality', 'corporation', 'water_authority', 'electricity_board',
+]
+
+const civicIssues = [
+  { icon: Droplets, titleKey: 'landing.issue1Title', descKey: 'landing.issue1Desc' },
+  { icon: Trash2, titleKey: 'landing.issue2Title', descKey: 'landing.issue2Desc' },
+  { icon: Car, titleKey: 'landing.issue3Title', descKey: 'landing.issue3Desc' },
+  { icon: Droplets, titleKey: 'landing.issue4Title', descKey: 'landing.issue4Desc' },
+  { icon: Lightbulb, titleKey: 'landing.issue5Title', descKey: 'landing.issue5Desc' },
+  { icon: Leaf, titleKey: 'landing.issue6Title', descKey: 'landing.issue6Desc' },
+]
+
+const governanceTiers = [
+  { icon: Users, titleKey: 'landing.govStep1Title', descKey: 'landing.govStep1Desc' },
+  { icon: Building2, titleKey: 'landing.govStep2Title', descKey: 'landing.govStep2Desc' },
+  { icon: Landmark, titleKey: 'landing.govStep3Title', descKey: 'landing.govStep3Desc' },
+]
+
+const keralaInitiatives = [
+  { icon: Wifi, titleKey: 'landing.init1Title', descKey: 'landing.init1Desc' },
+  { icon: Monitor, titleKey: 'landing.init2Title', descKey: 'landing.init2Desc' },
+  { icon: Globe, titleKey: 'landing.init3Title', descKey: 'landing.init3Desc' },
+  { icon: Leaf, titleKey: 'landing.init4Title', descKey: 'landing.init4Desc' },
+]
+
+const faqs = [
+  { qKey: 'landing.faq1Q', aKey: 'landing.faq1A' },
+  { qKey: 'landing.faq2Q', aKey: 'landing.faq2A' },
+  { qKey: 'landing.faq3Q', aKey: 'landing.faq3A' },
+  { qKey: 'landing.faq4Q', aKey: 'landing.faq4A' },
+  { qKey: 'landing.faq5Q', aKey: 'landing.faq5A' },
 ]
 
 export default function Landing() {
@@ -139,6 +171,96 @@ export default function Landing() {
             <span className="neo-badge inline-block px-4 py-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">
               + {t('authority.other')}
             </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-center text-3xl font-bold text-gray-900">
+            {t('landing.issuesTitle')}
+          </h2>
+          <p className="mt-3 text-center text-gray-600 max-w-3xl mx-auto">
+            {t('landing.issuesDesc')}
+          </p>
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {civicIssues.map((item, i) => (
+              <div key={i} className="neo-card p-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100">
+                  <item.icon className="h-5 w-5 text-amber-700" />
+                </div>
+                <h3 className="mt-4 font-semibold text-gray-900">{t(item.titleKey)}</h3>
+                <p className="mt-1 text-sm text-gray-600">{t(item.descKey)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-20 bg-gray-50 py-20 -mt-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-center text-3xl font-bold text-gray-900">
+            {t('landing.governanceTitle')}
+          </h2>
+          <p className="mt-3 text-center text-gray-600 max-w-3xl mx-auto">
+            {t('landing.governanceDesc')}
+          </p>
+          <div className="mt-10 grid gap-8 sm:grid-cols-3">
+            {governanceTiers.map((item, i) => (
+              <div key={i} className="neo-card p-8 text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-100">
+                  <item.icon className="h-7 w-7 text-emerald-700" />
+                </div>
+                <h3 className="mt-5 text-xl font-semibold text-gray-900">{t(item.titleKey)}</h3>
+                <p className="mt-2 text-gray-600">{t(item.descKey)}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 text-center text-sm text-gray-500 max-w-2xl mx-auto">
+            {t('landing.govExtra')}
+          </p>
+        </div>
+      </section>
+
+      <section className="pb-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-center text-3xl font-bold text-gray-900">
+            {t('landing.keralaInitTitle')}
+          </h2>
+          <p className="mt-3 text-center text-gray-600 max-w-3xl mx-auto">
+            {t('landing.keralaInitDesc')}
+          </p>
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {keralaInitiatives.map((item, i) => (
+              <div key={i} className="neo-card p-6 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100">
+                  <item.icon className="h-6 w-6 text-blue-700" />
+                </div>
+                <h3 className="mt-4 font-semibold text-gray-900">{t(item.titleKey)}</h3>
+                <p className="mt-1 text-sm text-gray-600">{t(item.descKey)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-20 bg-gray-50 py-20 -mt-20">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-center text-3xl font-bold text-gray-900">
+            {t('landing.faqTitle')}
+          </h2>
+          <div className="mt-10 space-y-4">
+            {faqs.map((item, i) => (
+              <details key={i} className="neo-card group cursor-pointer">
+                <summary className="flex items-center justify-between p-5 text-sm font-semibold text-gray-900 list-none">
+                  {t(item.qKey)}
+                  <ChevronDown className="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
+                </summary>
+                <div className="px-5 pb-5 text-sm text-gray-600">
+                  {t(item.aKey)}
+                </div>
+              </details>
+            ))}
           </div>
         </div>
       </section>
