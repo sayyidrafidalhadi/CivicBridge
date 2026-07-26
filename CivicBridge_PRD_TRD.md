@@ -1,11 +1,11 @@
-# CivicBridge
+# Nammude Shabdham
 ## Participatory Governance & Public Accountability
 
 ---
 
 # Project Overview
 
-**Project Name:** CivicBridge
+**Project Name:** Nammude Shabdham
 
 **Platform**
 - Progressive Web App (PWA)
@@ -525,14 +525,14 @@ Hour 4
 
 # Elevator Pitch
 
-CivicBridge is a lightweight digital governance platform that enables transparent communication between citizens and government. Citizens can report civic issues, upload evidence, and track resolution progress in real time. Government officers manage complaints through a dedicated dashboard while the public gains visibility into issue resolution, fostering accountability, transparency, and community participation.
+Nammude Shabdham is a lightweight digital governance platform that enables transparent communication between citizens and government. Citizens can report civic issues, upload evidence, and track resolution progress in real time. Government officers manage complaints through a dedicated dashboard while the public gains visibility into issue resolution, fostering accountability, transparency, and community participation.
 
 ---
 
 # Suggested Repository Structure
 
 ```
-civicbridge/
+nammude-shabdham/
 
 ├── public/
 

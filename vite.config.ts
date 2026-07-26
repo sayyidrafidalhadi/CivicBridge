@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'CivicBridge',
-        short_name: 'CivicBridge',
+        name: 'Nammude Shabdham',
+        short_name: 'Nammude Shabdham',
         description: 'Participatory Governance & Public Accountability Platform',
         theme_color: '#059669',
         background_color: '#f9fafb',

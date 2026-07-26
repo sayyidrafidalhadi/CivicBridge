@@ -1,6 +1,6 @@
 export default {
   "app": {
-    "name": "CivicBridge",
+    "name": "Nammude Shabdham",
     "tagline": "Building transparency between citizens and government."
   },
 
@@ -50,7 +50,7 @@ export default {
     "createAccount": "Create Account",
     "welcomeBack": "Welcome Back",
     "signUpDesc": "Sign up to report and track civic issues",
-    "signInDesc": "Sign in to your CivicBridge account",
+    "signInDesc": "Sign in to your Nammude Shabdham account",
     "fullName": "Full Name",
     "email": "Email",
     "password": "Password",

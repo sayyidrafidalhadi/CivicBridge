@@ -68,7 +68,7 @@ A lightweight digital governance platform enabling transparent communication bet
 
 ### Case Number Format
 
-`CB-YYYY-XXXXX` (CivicBridge prefix, year, 5-digit sequential number)
+`CB-YYYY-XXXXX` (Nammude Shabdham prefix, year, 5-digit sequential number)
 
 ## Project Structure
 

@@ -44,7 +44,7 @@ export async function sendComplaintNotification(
       <p><strong>Description:</strong> ${description}</p>
       <p><strong>Assigned To:</strong> ${authorityName}</p>
       <hr/>
-      <p><small>CivicBridge - Participatory Governance Platform</small></p>
+      <p><small>Nammude Shabdham - Participatory Governance Platform</small></p>
     `,
   })
 }

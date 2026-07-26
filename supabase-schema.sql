@@ -1,4 +1,4 @@
--- CivicBridge Database Schema — Fresh Install
+-- Nammude Shabdham Database Schema — Fresh Install
 -- Run this file in the Supabase SQL Editor
 
 -- 0. Extensions
