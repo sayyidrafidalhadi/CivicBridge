@@ -17,7 +17,9 @@ import ComplaintDetails from './pages/ComplaintDetails'
 import Admin from './pages/Admin'
 import MapView from './pages/MapView'
 import Settings from './pages/Settings'
+import Offline from './pages/Offline'
 import NotFound from './pages/NotFound'
+import UpdatePrompt from './pwa/UpdatePrompt'
 
 function ProtectedRoute({ children, role }: { children: React.ReactNode; role?: string }) {
   const { user, loading } = useAuth()
@@ -68,6 +70,7 @@ export default function App() {
           <Route path="/admin" element={<ProtectedRoute role="officer"><motion.div variants={pageTransition} initial="initial" animate="animate" exit="exit"><Admin /></motion.div></ProtectedRoute>} />
           <Route path="/map" element={<motion.div variants={pageTransition} initial="initial" animate="animate" exit="exit"><MapView /></motion.div>} />
           <Route path="/settings" element={<ProtectedRoute><motion.div variants={pageTransition} initial="initial" animate="animate" exit="exit"><Settings /></motion.div></ProtectedRoute>} />
+          <Route path="/offline" element={<motion.div variants={pageTransition} initial="initial" animate="animate" exit="exit"><Offline /></motion.div>} />
           <Route path="*" element={<motion.div variants={pageTransition} initial="initial" animate="animate" exit="exit"><NotFound /></motion.div>} />
         </Routes>
       </AnimatePresence>
@@ -83,6 +86,7 @@ export default function App() {
         </main>
         <Footer />
       </div>
+      <UpdatePrompt />
       <Toaster
         position="top-right"
         toastOptions={{

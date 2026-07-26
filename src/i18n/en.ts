@@ -231,5 +231,19 @@ export default {
     "saved": "Profile updated!",
     "saveError": "Failed to save",
     "idCopied": "User ID copied!"
+  },
+
+  "pwa": {
+    "install": "Install",
+    "installPrompt": "Install the app for offline access",
+    "updateAvailable": "Update available",
+    "update": "Update",
+    "offlineReady": "Ready to use offline"
+  },
+
+  "offline": {
+    "title": "You're Offline",
+    "description": "Check your internet connection and try again. Some features may be limited while offline.",
+    "retry": "Retry"
   }
 }

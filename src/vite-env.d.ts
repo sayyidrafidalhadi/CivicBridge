@@ -1,13 +1,19 @@
 /// <reference types="vite/client" />
 
-interface ImportMetaEnv {
-  readonly VITE_SUPABASE_URL: string
-  readonly VITE_SUPABASE_ANON_KEY: string
-  readonly VITE_CLOUDINARY_CLOUD_NAME: string
-  readonly VITE_CLOUDINARY_UPLOAD_PRESET: string
-  readonly VITE_EMAILJSON_URL: string
-}
+declare module 'virtual:pwa-register/react' {
+  import type { Dispatch, SetStateAction } from 'react'
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv
+  interface RegisterSWOptions {
+    onRegistered?: (registration: ServiceWorkerRegistration | undefined) => void
+    onRegisterError?: (error: unknown) => void
+  }
+
+  function useRegisterSW(options?: RegisterSWOptions): {
+    needRefresh: [boolean, Dispatch<SetStateAction<boolean>>]
+    offlineReady: [boolean, Dispatch<SetStateAction<boolean>>]
+    updateServiceWorker: (reloadPage?: boolean) => Promise<void>
+  }
+
+  export { useRegisterSW }
+  export type { RegisterSWOptions }
 }
