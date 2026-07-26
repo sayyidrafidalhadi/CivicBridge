@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   PlusCircle, Eye, CheckCircle2, ArrowRight, FileText,
   ShieldCheck, Users, Building2, Route, GitBranch, Bell,
-  Droplets, Trash2, Car, Lightbulb, Wifi, Leaf, HelpCircle,
+  Droplets, Trash2, Car, Lightbulb, Wifi, Leaf,
   Landmark, Globe, Monitor, ChevronDown
 } from 'lucide-react'
 
